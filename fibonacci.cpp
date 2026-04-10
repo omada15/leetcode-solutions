@@ -11,8 +11,6 @@
 #include <cstdint>
 #include <iostream>
 using namespace std;
-typedef __int128_t int128;
-typedef __uint128_t uint128;
 const size_t bitLimit = 512;
 
 int intBitLimit = bitLimit; //appease the c++ gods by converting size_t to int
@@ -155,7 +153,7 @@ public:
     }
 };
 
-ostream &operator<<(ostream &os, int128 n) { // a helper function to print 128 bit numbers
+ostream &operator<<(ostream &os, __int128 n) { // a helper function to print 128 bit numbers
 	if (n == 0)
 		return os << "0";
 	if (n < 0) {
@@ -172,7 +170,7 @@ ostream &operator<<(ostream &os, int128 n) { // a helper function to print 128 b
 }
 
 // ah here our code starts
-vector<bigInt> fibs(20000); // this is a list that i will use to store fibonacci numbers. all the values are automatically set to the default value
+vector<bigInt> fibs(10000); // this is a list that i will use to store fibonacci numbers. all the values are automatically set to the default value
 int maxn = 0; // this variable is used for printing fibonacci number list
 
 bigInt fib(int n) { // this is the actual code that calculates fibonacci numbers
@@ -196,6 +194,7 @@ int main() {
     cin >> a;
     if (a > 10000) {a = 10000; cout << "No greater than 10k pls";}
     cout << "bit limit " << bitLimit*64 << endl;
+    fibs.resize(a);
 	bigInt n = fib(a);
     /*
 	for (int i = 0; i < maxn; i++) { // here i need to know what the highest fibonacci number that was calculated is for printing the list
