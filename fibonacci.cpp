@@ -1,14 +1,36 @@
+/*
+    Yes, this code is undocumented (not anymore, but i dont delete/edit old comments. the documentation is not written for a coder)
+
+    drag the bar to the right until you can see the head of the arrow
+    just make sure the input on the box over there ------------------------------------------------------------------------------------------------------------------------->
+    is exactly one number which is int32 and less than 10000 because the 10kth fibonacci number is quite close to 2^512
+*/
+
+// these are libraries, don't worry about them
 #include <bits/stdc++.h>
 #include <cstdint>
 #include <iostream>
 using namespace std;
 typedef __int128_t int128;
+typedef __uint128_t uint128;
 
+/**
+    In coding, we use the binary system.
+    these numbers can get very long
+    think 01010100101111010101111010111011010 (11373573594)
+    that number has quite a few digits
+    c++ by default lets you use 32 digits to store these numbers
+
+    but if you ran the program, you might notice thats a lot more than 32 digits
+    the code below makes a special structure that lets me exceed that.
+    You do not need to read the code to understand the rest of the function, but just know
+    it lets me go up to 512 digits (1.34*10^154)
+*/
 class uint512 {
 private:
-    array<uint64_t, 8> data;
+    array<uint64_t, 8> data; // the actual structure is broken into 8 64 bit long segments. a bit is a 1 or a 0 in binary
 
-    static string addStrings(string s1, const string& s2) {
+    static string addStrings(string s1, const string& s2) { // this is a helper function i will not document
         string res = "";
         int i = s1.size() - 1, j = s2.size() - 1, carry = 0;
         while (i >= 0 || j >= 0 || carry) {
@@ -20,7 +42,7 @@ private:
         return res;
     }
 
-    string toDecimalString() const {
+    string toDecimalString() const { // as is this one
         string decimalStr = "0";
         string powerOfTwo = "1";
 
@@ -37,11 +59,15 @@ private:
     }
 
 public:
-    uint512(uint64_t low = 0) {
+    uint512(uint64_t low = 0) { // this sets the default value of a uint512 (0), which is used later
         data.fill(0);
         data[0] = low;
     }
-    uint512 operator+(const uint512& other) const {
+    /*
+        This is what I actually wrote this code for, learning how to overlaod the operator[operation]() function
+        it allows me to make +  and - do what i want
+    */
+    uint512 operator+(const uint512& other) const { 
         uint512 result;
         unsigned __int128 carry = 0;
         for (int i = 0; i < 8; ++i) {
@@ -69,6 +95,7 @@ public:
         return result;
     }
 
+    // these operator overloads are the standard operations you can run. ==, <, >, <=, >=
     bool operator==(const uint512& other) const {
         return data == other.data;
     }
@@ -81,11 +108,11 @@ public:
         return false;
     }
 
-    bool operator>(const uint512& other) const { return other < *this; }
-    bool operator<=(const uint512& other) const { return !(*this > other); }
-    bool operator>=(const uint512& other) const { return !(*this < other); }
+    bool operator>(const uint512& other) const { return other < *this; } // im lazy
+    bool operator<=(const uint512& other) const { return !(*this > other); } // very lazy
+    bool operator>=(const uint512& other) const { return !(*this < other); } 
 
-    int length(bool hexMode = false) const {
+    int length(bool hexMode = false) const { // yet another helper function, returns the length
         if (hexMode) {
             for (int i = 7; i >= 0; --i) {
                 if (data[i] != 0) {
@@ -105,7 +132,7 @@ public:
         }
     }
 
-    void print(bool hexMode = true) const {
+    void print(bool hexMode = true) const { // printer function because cout << does not accept 512 bit integers
         if (hexMode) {
             bool leadingZeros = true;
             for (int i = 7; i >= 0; --i) {
@@ -124,18 +151,18 @@ public:
     }
 };
 
-typedef __uint128_t uint128;
-vector<uint512> fibs(10000);
-int maxn = 0;
+// ah here our code starts
+vector<uint512> fibs(10000); // this is a list that i will use to store fibonacci numbers. all the values are automatically set to the default value
+int maxn = 0; // this variable is used for printing fibonacci number list
 
-uint512 fib(int n) {
-	uint512 j;
-	if (n <= 1)
+uint512 fib(int n) { // this is the actual code that calculates fibonacci numbers
+	uint512 j; 
+	if (n <= 1) // the 1st (and 0th) fibonacci numbers are both 1
 		return 1;
-	else if (fibs[n] != 0)
-		return fibs[n];
+	else if (fibs[n] != 0) // this is where the default value from line 61 is used. I am checking if the nth fibonacci number was already calculated
+		return fibs[n]; // if it is then use that because otherwise slow 
 	else {
-		j = fib(n - 1) + fib(n - 2);
+		j = fib(n - 1) + fib(n - 2); // this is the core of the calculation. if you need a refresher, the nth fibonacci number is the sum of the two previous fibonacci numbers
 		fibs[n] = j;
 		if (n > maxn)
 			maxn = n;
@@ -143,7 +170,7 @@ uint512 fib(int n) {
 	}
 }
 
-ostream &operator<<(ostream &os, int128 n) {
+ostream &operator<<(ostream &os, int128 n) { // a helper function to print 128 bit numbers
 	if (n == 0)
 		return os << "0";
 	if (n < 0) {
@@ -164,10 +191,10 @@ int main() {
 	cin >> a;
 	uint512 n = fib(a);
     /*
-	for (int i = 0; i < maxn; i++) {
+	for (int i = 0; i < maxn; i++) { // here i need to know what the highest fibonacci number that was calculated is for printing the list
 		fibs[i].print(false);
 	}*/
 	cout << "solution " << endl;
-	n.print(false);
-    cout << n.length();
+	n.print(false); // print the fibonacci number
+    cout << "digits " << n.length(); // and its length
 }
